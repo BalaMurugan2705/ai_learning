@@ -1,6 +1,6 @@
-from embeddings import create_embedding
-from vector_store import structure_collection
-from generator import generate_answer
+from app.embeddings import create_embedding
+from app.vector_store import structure_collection
+from app.generator import generate_answer
 import os 
 from dotenv import load_dotenv
 

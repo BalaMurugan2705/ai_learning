@@ -1,6 +1,6 @@
-from chunker import structure_aware_chunk
-from embeddings import create_embedding
-from vector_store import structure_collection
+from app.chunker import structure_aware_chunk
+from app.embeddings import create_embedding
+from app.vector_store import structure_collection
 
 
 def ingest_document(
@@ -48,7 +48,7 @@ def ingest_document(
             chunk["metadata"]
         )
 
-    structure_collection.add(
+    structure_collection.upsert(
         ids=ids,
         documents=documents,
         embeddings=embeddings,

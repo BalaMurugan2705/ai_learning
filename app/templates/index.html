@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Ask My Documents</title>
+
+</head>
+
+
+<body>
+
+    <h1>Ask My Documents</h1>
+
+
+    <hr>
+
+
+    <h2>Upload Document</h2>
+
+    <input
+        type="file"
+        id="fileInput"
+        accept=".md,.txt,.pdf"
+
+    >
+
+    <button onclick="uploadDocument()">
+        Upload & Ingest
+    </button>
+
+
+    <p id="uploadStatus"></p>
+
+
+    <hr>
+
+
+    <h2>Ask a Question</h2>
+
+
+    <label>
+        SDK Version:
+    </label>
+
+    <select id="sdkVersion">
+
+        <option value="">
+            No filter
+        </option>
+
+        <option value="v2">
+            v2
+        </option>
+
+        <option value="v3">
+            v3
+        </option>
+
+    </select>
+
+
+    <br>
+    <br>
+
+
+    <textarea
+        id="question"
+        rows="4"
+        cols="60"
+        placeholder="Ask a question..."
+    ></textarea>
+
+
+    <br>
+    <br>
+
+
+    <button 
+     id="askButton"
+    onclick="askQuestion()">
+        Ask
+    </button>
+
+    <h2>Answer</h2>
+
+    <div id="answer"></div>
+
+
+    <h2>Sources</h2>
+
+    <div id="sources"></div>
+
+
+    <script src="/static/app.js"></script>
+
+</body>
+
+</html>

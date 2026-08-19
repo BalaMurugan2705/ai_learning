@@ -1,4 +1,4 @@
-from loader import load_document
+from app.loader import load_document
 
 
 def simple_chunk(text, chunk_size=300):
