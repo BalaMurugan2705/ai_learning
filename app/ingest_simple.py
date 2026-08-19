@@ -23,7 +23,7 @@ for document_info in DOCUMENTS:
     for chunk_number, chunk_text in enumerate(raw_chunks):
 
         chunk = {
-            "chunk_id": f"{document_info['page_id']}-simple-{chunk_number}",
+            "chunk_id": f"{document_info['page_id']}-{document_info['sdk_version']}-simple-{chunk_number}",
             "text": chunk_text,
             "metadata": {
                 "source_file": document_info["file"],

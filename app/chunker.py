@@ -65,7 +65,7 @@ def structure_aware_chunk(
 
 def create_chunk(text, source_file, page_id, sdk_version, page_type, chunk_number):
     return {
-        "chunk_id": f"{page_id}-{chunk_number}",
+        "chunk_id": f"{page_id}-{sdk_version}-{chunk_number}",
         "text": text,
         "metadata": {
             "source_file": source_file,

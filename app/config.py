@@ -35,4 +35,10 @@ DOCUMENTS = [
         "sdk_version": "v3",
         "page_type": "reference",
     },
+    {
+    "file": "client_v2.md",
+    "page_id": "client",
+    "sdk_version": "v2",
+    "page_type": "reference",
+    },
 ]
