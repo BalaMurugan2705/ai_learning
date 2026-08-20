@@ -5,97 +5,160 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Ask My Documents</title>
+    <title>Docs Assistant</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
 
 </head>
 
 
 <body>
 
-    <h1>Ask My Documents</h1>
+    <div class="app">
 
+        <header class="topbar">
 
-    <hr>
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" fill="url(#brandGrad)"/>
+                        <path d="M8 11.5l2.5 2.5L16 8" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="brandGrad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#818cf8"/>
+                                <stop offset="1" stop-color="#4f46e5"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </span>
+                <div class="brand-text">
+                    <h1>Docs Assistant</h1>
+                    <p>Answers are grounded only in what you've uploaded.</p>
+                </div>
+            </div>
 
+            <div class="topbar-actions">
+                <button
+                    id="themeToggle"
+                    class="icon-button"
+                    type="button"
+                    aria-label="Toggle color theme"
+                    title="Toggle theme"
+                >
+                    <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                    <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    </svg>
+                </button>
 
-    <h2>Upload Document</h2>
+                <button id="newChatButton" class="ghost-button" onclick="startNewChat()">
+                    New chat
+                </button>
+            </div>
 
-    <input
-        type="file"
-        id="fileInput"
-        accept=".md,.txt,.pdf"
+        </header>
 
-    >
+        <section class="toolbar">
 
-    <button onclick="uploadDocument()">
-        Upload & Ingest
-    </button>
+            <label
+                id="dropZone"
+                for="fileInput"
+                class="drop-zone"
+            >
+                <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 15V4M12 4L7.5 8.5M12 4l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+                <span id="dropZoneLabel">
+                    <strong>Upload a document</strong>
+                    <span class="drop-zone-detail"> — drop a file or click to browse</span>
+                </span>
+                <input
+                    type="file"
+                    id="fileInput"
+                    accept=".md,.txt,.pdf"
+                    hidden
+                >
+            </label>
 
+            <div class="toolbar-side">
 
-    <p id="uploadStatus"></p>
+                <div class="segmented" id="sdkVersionGroup" role="group" aria-label="Filter by SDK version">
+                    <button type="button" class="segmented-option is-active" data-value="">All versions</button>
+                    <button type="button" class="segmented-option" data-value="v2">v2</button>
+                    <button type="button" class="segmented-option" data-value="v3">v3</button>
+                </div>
 
+                <div id="uploadStatus" class="status" role="status" aria-live="polite"></div>
 
-    <hr>
+            </div>
 
+        </section>
 
-    <h2>Ask a Question</h2>
+        <main id="chat" class="chat">
 
+            <div id="emptyState" class="empty-state">
+                <div class="empty-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" fill="url(#emptyGrad)" fill-opacity="0.15" stroke="url(#emptyGrad)" stroke-width="1.2"/>
+                        <path d="M8 11.5l2.5 2.5L16 8" stroke="url(#emptyGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="emptyGrad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#818cf8"/>
+                                <stop offset="1" stop-color="#4f46e5"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h2>Ask something about your documents</h2>
+                <p>Every answer cites the exact chunk it came from — or refuses if it can't.</p>
 
-    <label>
-        SDK Version:
-    </label>
+                <div class="example-chips">
+                    <button type="button" class="example-chip">What is the default value of retry_backoff_ms?</button>
+                    <button type="button" class="example-chip">Is api_key required for Authentication.configure()?</button>
+                    <button type="button" class="example-chip">What does the strict parameter control in Response.parse()?</button>
+                </div>
+            </div>
 
-    <select id="sdkVersion">
+        </main>
 
-        <option value="">
-            No filter
-        </option>
+        <form id="composer" class="composer" onsubmit="return false;">
 
-        <option value="v2">
-            v2
-        </option>
+            <textarea
+                id="question"
+                rows="1"
+                placeholder="Ask a question..."
+            ></textarea>
 
-        <option value="v3">
-            v3
-        </option>
+            <button id="askButton" class="send-button" type="submit" aria-label="Send question">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 12h15M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
 
-    </select>
+        </form>
 
+        <p class="composer-hint">Enter to send · Shift + Enter for a new line</p>
 
-    <br>
-    <br>
-
-
-    <textarea
-        id="question"
-        rows="4"
-        cols="60"
-        placeholder="Ask a question..."
-    ></textarea>
-
-
-    <br>
-    <br>
-
-
-    <button 
-     id="askButton"
-    onclick="askQuestion()">
-        Ask
-    </button>
-
-    <h2>Answer</h2>
-
-    <div id="answer"></div>
-
-
-    <h2>Sources</h2>
-
-    <div id="sources"></div>
-
+    </div>
 
     <script src="/static/app.js"></script>
 

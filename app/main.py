@@ -1,94 +1,39 @@
-from fastapi import FastAPI, UploadFile, File
-from app.rag import answer_question
-from app.ingestion_service import ingest_document
-from pydantic import BaseModel
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+import logging
 from pathlib import Path
-from app.document_loader import load_uploaded_document
 
-app = FastAPI()
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
-ALLOWED_EXTENSIONS = {
-    ".md",
-    ".txt",
-     ".pdf",
-}
+from app.api.routes import router
+from app.core.logging_config import configure_logging
 
-class QuestionRequest(BaseModel):
+configure_logging()
+logger = logging.getLogger(__name__)
 
-    question: str
-
-    sdk_version: str | None = None
 BASE_DIR = Path(__file__).resolve().parent
+
+app = FastAPI(
+    title="Docs Assistant",
+    description="Retrieval-augmented Q&A over versioned SDK reference documentation.",
+    version="1.0.0",
+)
 
 app.mount(
     "/static",
-    StaticFiles(
-        directory=BASE_DIR / "static"
-    ),
+    StaticFiles(directory=BASE_DIR / "static"),
     name="static",
 )
-@app.get(
-    "/",
-    response_class=HTMLResponse,
-)
-def home():
 
-    html_file = (
-        BASE_DIR
-        / "templates"
-        / "index.html"
-    )
-
-    return html_file.read_text(
-        encoding="utf-8"
-    )
-
-@app.post("/upload")
-async def upload_document(
-    file: UploadFile = File(...)
-):
-
-    extension = Path(file.filename).suffix.lower()
-
-    if extension not in ALLOWED_EXTENSIONS:
-
-        return {
-            "error": (
-                "Unsupported file type. "
-                "Please upload .md or .txt files."
-            )
-        }
-
-    content = await file.read()
-
-    text = load_uploaded_document(
-        filename=file.filename,
-        content=content,
-    )
-
-    chunk_count = ingest_document(
-        filename=file.filename,
-        text=text,
-    )
-
-    return {
-        "filename": file.filename,
-        "chunks_indexed": chunk_count,
-        "message": "Document ingested successfully.",
-    }
+app.include_router(router)
 
 
-@app.post("/ask")
-def ask_question(request: QuestionRequest):
+@app.get("/health", tags=["meta"])
+def health():
+    return {"status": "ok"}
 
-    answer, sources = answer_question(
-        request.question,
-        sdk_version=request.sdk_version,
-    )
 
-    return {
-        "answer": answer,
-        "sources": sources,
-    }
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled error on %s %s", request.method, request.url.path)
+    return JSONResponse(status_code=500, content={"detail": "Internal server error."})
